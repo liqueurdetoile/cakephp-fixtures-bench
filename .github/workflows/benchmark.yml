@@ -86,9 +86,9 @@ jobs:
     - name: Composer install
       run: |
           if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-            composer install --ignore-platform-reqs
+            composer update --ignore-platform-reqs
           else
-            composer install
+            composer update
           fi
           composer run-script post-install-cmd --no-interaction
 
@@ -189,11 +189,7 @@ jobs:
 
     - name: Composer install
       run: |
-          if [[ ${{ matrix.php-version }} == '8.0' ]]; then
-            composer install --ignore-platform-reqs
-          else
-            composer install
-          fi
+          composer update
           composer run-script post-install-cmd --no-interaction
 
     - name: Run PHPUnit All Fixtures all time
