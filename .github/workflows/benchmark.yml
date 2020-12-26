@@ -83,30 +83,52 @@ jobs:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ steps.key-date.outputs.date }}-${{ hashFiles('composer.json') }}-${{ matrix.prefer-lowest }}
 
-    - name: composer install
-      run: |
-        if ${{ matrix.prefer-lowest == 'prefer-lowest' }}; then
-          composer update --prefer-lowest --prefer-stable
+    run: |
+        if [[ ${{ matrix.php-version }} == '8.0' ]]; then
+          composer install --ignore-platform-reqs
         else
-          composer update
+          composer install
         fi
+        composer run-script post-install-cmd --no-interaction
 
     - name: Setup problem matchers for PHPUnit
       if: matrix.php-version == '7.4' && matrix.db-type == 'mysql'
       run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-    - name: Run PHPUnit
+    - name: Run PHPUnit All Fixtures each time
       env:
         REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
         MEMCACHED_PORT: ${{ job.services.memcached.ports['11211'] }}
       run: |
-        if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DB_URL='sqlite:///:memory:'; fi
-        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DB_URL='mysql://root:root@127.0.0.1/cbench'; fi
-        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DB_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
-        if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DB_URL='mysql://root:root@127.0.0.1/cbench'; fi
-        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DB_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DATABASE_TEST_URL='sqlite:///:memory:'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
+        if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
         vendor/bin/phpunit --filter AllFixturesTest
+
+    - name: Run PHPUnit Half optimized fixtures
+      env:
+        REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
+        MEMCACHED_PORT: ${{ job.services.memcached.ports['11211'] }}
+      run: |
+        if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DATABASE_TEST_URL='sqlite:///:memory:'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
+        if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
         vendor/bin/phpunit --filter HalfOptimizedFixturesTest
+
+    - name: Run PHPUnit Full optimized fixtures
+      env:
+        REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
+        MEMCACHED_PORT: ${{ job.services.memcached.ports['11211'] }}
+      run: |
+        if [[ ${{ matrix.db-type }} == 'sqlite' ]]; then export DATABASE_TEST_URL='sqlite:///:memory:'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
+        if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
         vendor/bin/phpunit --filter FullyOptimizedFixturesTest
 
   testsuite-windows:
@@ -164,13 +186,28 @@ jobs:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ steps.key-date.outputs.date }}-${{ hashFiles('composer.json') }}-${{ matrix.prefer-lowest }}
 
-    - name: composer install
-      run: composer install
+    run: |
+        if [[ ${{ matrix.php-version }} == '8.0' ]]; then
+          composer install --ignore-platform-reqs
+        else
+          composer install
+        fi
+        composer run-script post-install-cmd --no-interaction
 
-    - name: Run PHPUnit
+    - name: Run PHPUnit All Fixtures all time
       env:
-        DB_URL: 'sqlserver://@(localdb)\MSSQLLocalDB/cbench'
+        DATABASE_TEST_URL: 'sqlserver://@(localdb)\MSSQLLocalDB/cbench'
       run: |
           vendor/bin/phpunit --filter AllFixturesTest
+
+    - name: Run PHPUnit Half Optimized fixtures
+      env:
+        DATABASE_TEST_URL: 'sqlserver://@(localdb)\MSSQLLocalDB/cbench'
+      run: |
           vendor/bin/phpunit --filter HalfOptimizedFixturesTest
+
+    - name: Run PHPUnit Fully optimized fixtures
+      env:
+        DATABASE_TEST_URL: 'sqlserver://@(localdb)\MSSQLLocalDB/cbench'
+      run: |
           vendor/bin/phpunit --filter FullyOptimizedFixturesTest
