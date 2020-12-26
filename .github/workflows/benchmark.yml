@@ -117,7 +117,7 @@ jobs:
         if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
         if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
         if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
-        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/postgres'; fi
         vendor/bin/phpunit --filter HalfOptimizedFixturesTest
 
     - name: Run PHPUnit Full optimized fixtures
@@ -129,7 +129,7 @@ jobs:
         if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} != '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
         if [[ ${{ matrix.db-type }} == 'mysql' && ${{ matrix.php-version }} == '7.2' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench?encoding=utf8'; fi
         if [[ ${{ matrix.db-type }} == 'mariadb' ]]; then export DATABASE_TEST_URL='mysql://root:root@127.0.0.1/cbench'; fi
-        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/cbench'; fi
+        if [[ ${{ matrix.db-type }} == 'pgsql' ]]; then export DATABASE_TEST_URL='postgres://postgres:postgres@127.0.0.1/postgres'; fi
         vendor/bin/phpunit --filter FullyOptimizedFixturesTest
 
   testsuite-windows:
