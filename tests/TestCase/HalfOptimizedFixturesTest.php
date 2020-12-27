@@ -5,24 +5,22 @@ use Cake\TestSuite\TestCase;
 
 class HalfOptimizedFixturesTest extends TestCase
 {
+    public $fixtures = ['app.Users', 'app.Deployments'];
     public $autoFixtures = false;
-    public $fixtures = ['app.Users', 'app.Deployments', 'app.Creleases', 'app.Sreleases'];
 
     public function getFixturesList(): array
     {
         $pattern = [];
 
         for ($i=0; $i < 100; $i++) {
-            $pattern[] = [
-              ['Users', 'Deployments']
-            ];
+            $pattern[] = [];
         }
 
         return $pattern;
     }
 
     /** @dataProvider getFixturesList */
-    public function testFixturesLoading(array $fixtures)
+    public function testFixturesLoading(array $fixtures = [])
     {
         call_user_func_array(array($this, 'loadFixtures'), $fixtures);
         $this->assertTrue(true);

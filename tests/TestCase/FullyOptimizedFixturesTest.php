@@ -1,12 +1,11 @@
 <?php
 namespace App\Test\TestCase;
 
-use Cake\TestSuite\TestCase;
+use App\TestSuite\TestCase;
 
 class FullyOptimizedFixturesTest extends TestCase
 {
-    public $autoFixtures = false;
-    public $fixtures = ['app.Users', 'app.Deployments', 'app.Creleases', 'app.Sreleases'];
+    public $fixtures = ['app.Users'];
 
     public function getFixturesList(): array
     {
@@ -14,12 +13,10 @@ class FullyOptimizedFixturesTest extends TestCase
 
         for ($i=0; $i < 100; $i++) {
             if ($i < 70) {
-                $pattern[] = [
-                  ['Users']
-                ];
+                $pattern[] = [];
             } else {
                 $pattern[] = [
-                  ['Users', 'Deployments']
+                  ['app.Deployments']
                 ];
             }
         }
@@ -28,7 +25,7 @@ class FullyOptimizedFixturesTest extends TestCase
     }
 
     /** @dataProvider getFixturesList */
-    public function testFixturesLoading(array $fixtures)
+    public function testFixturesLoading(?array $fixtures = []): void
     {
         call_user_func_array(array($this, 'loadFixtures'), $fixtures);
         $this->assertTrue(true);

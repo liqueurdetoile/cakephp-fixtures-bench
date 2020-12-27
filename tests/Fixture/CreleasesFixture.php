@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Test\Fixture;
 
-use Cake\TestSuite\Fixture\TestFixture;
+use App\TestSuite\Fixture\TestFixture;
 
 /**
  * CreleasesFixture
@@ -27,7 +27,7 @@ class CreleasesFixture extends TestFixture
         ],
         '_options' => [
             'engine' => 'InnoDB',
-            
+
         ],
     ];
     // phpcs:enable
